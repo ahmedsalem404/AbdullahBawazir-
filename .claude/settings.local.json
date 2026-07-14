@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(C:\\\\Users\\\\Ahmed-Salem\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Ahmed-Salem-Desktop------------------\\\\e7695201-2279-459b-9747-416d6a18a335\\\\tasks\\\\bmj1j36pl.output *)",
+      "Bash(curl -s http://localhost:3000/api/todos)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -s http://localhost:3002)",
+      "Bash(npx next *)",
+      "Bash(curl *)"
+    ]
+  }
+}

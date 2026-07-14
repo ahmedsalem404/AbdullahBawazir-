@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background: #f5f6f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(23, 143, 90, 0.08), transparent 34rem),
+    linear-gradient(180deg, #ffffff 0%, #f5f6f8 54%, #eef1f4 100%);
+  color: #141414;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+@page {
+  size: A4;
+  margin: 10mm 15mm;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide main content sections, aside, nav, and elements marked as no-print */
+  main > section, aside, nav, .no-print {
+    display: none !important;
+  }
+
+  /* Reset layout constraints on body and html */
+  html, body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Force modal containers to be standard static blocks with visible overflow to avoid height collapse and clipping */
+  .fixed.inset-0,
+  .fixed.inset-0 > div,
+  .w-full.max-w-4xl,
+  .w-full.max-w-5xl,
+  .w-full.max-w-3xl,
+  .max-h-\[85vh\] {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    animation: none !important;
+    overflow: visible !important;
+  }
+
+  /* Force the printable area to flow naturally from top-left of A4 page */
+  #printable-invoice,
+  [id^="printable-"] {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 10mm !important; /* Printable margins */
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

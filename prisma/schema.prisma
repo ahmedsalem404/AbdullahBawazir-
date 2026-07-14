@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  full_name String
+  role      String   @default("WORKER")
+  branch    String   @default("الحسوة")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("profiles")
+}
+
+model Engineer {
+  id          String       @id @default(uuid())
+  name        String
+  phone       String?
+  address     String?
+  branch      String       @default("الحسوة")
+  isDeleted   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  customers   Customer[]
+  attendances Attendance[]
+
+  @@index([branch])
+  @@map("engineers")
+}
+
+model Customer {
+  id               String    @id @default(uuid())
+  customer_name    String
+  phone            String
+  car_type         String
+  car_year         Int
+  engineer_id      String?
+  work_notes       String    @db.Text
+  required_amount  Float     @default(0)
+  paid_amount      Float     @default(0)
+  injectors_amount Float     @default(0)
+  currency         String    @default("SAR")
+  payment_method   String    @default("Cash")
+  transfer_type    String?
+  is_not_worked_on Boolean   @default(false)
+  branch           String    @default("الحسوة")
+  createdBy        String?
+  createdAt        DateTime  @default(now())
+  engineer         Engineer? @relation(fields: [engineer_id], references: [id])
+
+  @@index([createdAt])
+  @@index([customer_name])
+  @@index([phone])
+  @@index([engineer_id])
+  @@index([branch])
+  @@map("customers")
+}
+
+model Attendance {
+  id          String   @id @default(uuid())
+  engineer_id String
+  branch      String
+  date        String
+  time        String
+  createdAt   DateTime @default(now())
+  engineer    Engineer @relation(fields: [engineer_id], references: [id], onDelete: Cascade)
+
+  @@index([engineer_id])
+  @@index([branch, date])
+  @@map("attendance")
+}
+
+model ArchivedCustomer {
+  id               String   @id @default(uuid())
+  customer_name    String
+  phone            String
+  car_type         String
+  car_year         Int
+  engineer_id      String?
+  engineer_name    String?
+  work_notes       String   @db.Text
+  required_amount  Float    @default(0)
+  paid_amount      Float    @default(0)
+  injectors_amount Float    @default(0)
+  currency         String   @default("SAR")
+  payment_method   String   @default("Cash")
+  transfer_type    String?
+  is_not_worked_on Boolean  @default(false)
+  branch           String   @default("الحسوة")
+  createdBy        String?
+  createdAt        DateTime @default(now())
+  archivedAt       DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([archivedAt])
+  @@index([customer_name])
+  @@index([phone])
+  @@index([branch])
+  @@map("archived_customers")
+}
+
+model Company {
+  id             String       @id @default(uuid())
+  name           String
+  location       String?
+  contact_number String?
+  branch         String       @default("الحسوة")
+  created_at     DateTime     @default(now())
+  cars           CompanyCar[]
+
+  @@index([branch])
+  @@map("companies")
+}
+
+model CompanyCar {
+  id               String           @id @default(uuid())
+  company_id       String
+  name             String
+  year             Int
+  color            String?
+  plate_or_chassis String
+  created_at       DateTime         @default(now())
+  company          Company          @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  invoices         CompanyInvoice[]
+
+  @@index([company_id])
+  @@map("company_cars")
+}
+
+model CompanyInvoice {
+  id            String     @id @default(uuid())
+  car_id        String
+  work_details  String     @db.Text
+  parts_details String?    @db.Text
+  parts_total   Float      @default(0)
+  labor_total   Float      @default(0)
+  grand_total   Float      @default(0)
+  currency      String     @default("SAR")
+  is_accounted  Boolean    @default(false)
+  is_sent       Boolean    @default(false)
+  branch        String     @default("الحسوة")
+  created_at    DateTime   @default(now())
+  car           CompanyCar @relation(fields: [car_id], references: [id], onDelete: Cascade)
+
+  @@index([car_id])
+  @@map("company_invoices")
+}
+
+model SystemSettings {
+  id               String   @id @default("default")
+  last_backup_date DateTime @default(now())
+
+  @@map("system_settings")
+}
