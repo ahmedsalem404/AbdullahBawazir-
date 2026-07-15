@@ -37,12 +37,12 @@ export function DashboardToolbar({
             <Plus size={18} />
           </span>
         </button>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 w-full sm:w-auto sm:flex-row sm:items-center">
           {/* زر التبديل السريع "قيد العمل" */}
           <button
             onClick={onOnlyUnderWorkToggle}
             type="button"
-            className={`flex h-12 items-center gap-2 rounded-2xl border px-4 font-bold transition-all duration-300 active:scale-95 cursor-pointer ${
+            className={`flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border px-4 font-bold transition-all duration-300 active:scale-95 cursor-pointer ${
               onlyUnderWork
                 ? "border-amber-200 bg-amber-50 text-amber-700 shadow-[0_4px_12px_rgba(245,158,11,0.15)]"
                 : "border-brand-line bg-white text-slate-650 hover:bg-slate-50"
@@ -52,7 +52,7 @@ export function DashboardToolbar({
             قيد العمل
           </button>
 
-          <label className="relative block">
+          <label className="relative block w-full sm:w-auto">
             <Search
               className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
               size={18}
@@ -64,7 +64,7 @@ export function DashboardToolbar({
               className="h-12 w-full rounded-2xl border border-brand-line bg-white px-10 text-base outline-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus:border-brand-green focus:ring-4 focus:ring-brand-green/12 placeholder-slate-400 sm:w-72"
             />
           </label>
-          <label className="relative block">
+          <label className="relative block w-full sm:w-auto">
             <CalendarDays
               className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
               size={18}
