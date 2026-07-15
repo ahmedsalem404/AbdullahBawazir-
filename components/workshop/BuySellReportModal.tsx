@@ -102,6 +102,7 @@ export function BuySellReportModal({ onClose, branch = "الحسوة" }: BuySell
     : "فرع الحسوة (الحسوة محطة ومجمع بتر بارك)";
 
   const currentDate = new Intl.DateTimeFormat("ar-SA", {
+    calendar: "gregory",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

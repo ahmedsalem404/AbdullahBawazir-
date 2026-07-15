@@ -31,6 +31,7 @@ export const formatCurrency = (value: number, currency: string = "SAR") => {
  */
 export const formatDate = (value: string | Date) =>
   new Intl.DateTimeFormat("ar-SA", {
+    calendar: "gregory",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

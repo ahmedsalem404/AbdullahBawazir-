@@ -100,6 +100,7 @@ export function RegularReportModal({ onClose, branch = "الحسوة" }: Regular
     : "فرع الحسوة (الحسوة محطة ومجمع بتر بارك)";
 
   const currentDate = new Intl.DateTimeFormat("ar-SA", {
+    calendar: "gregory",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
