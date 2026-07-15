@@ -143,7 +143,12 @@ export function RegularReportModal({ onClose, branch = "الحسوة" }: Regular
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/30 px-4 py-6 backdrop-blur-md">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 grid place-items-center bg-slate-950/30 px-4 py-6 backdrop-blur-md cursor-pointer"
+    >
       <style>{`
         @keyframes modalOpen {
           from { transform: scale(0.96); opacity: 0; }
@@ -171,11 +176,11 @@ export function RegularReportModal({ onClose, branch = "الحسوة" }: Regular
           }
         }
       `}</style>
-      <div className="w-full max-w-4xl rounded-[2.5rem] border border-slate-200/40 bg-slate-100/50 p-2 shadow-[0_24px_60px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-all duration-550 ease-[cubic-bezier(0.32,0.72,0,1)] animate-modal-open">
-        <div className="max-h-[85vh] w-full overflow-y-auto rounded-[calc(2.5rem-0.5rem)] bg-white p-5 sm:p-8 border border-white/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)]">
+      <div className="w-full max-w-4xl max-w-full rounded-[2.5rem] border border-slate-200/40 bg-slate-100/50 p-2 shadow-[0_24px_60px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-all duration-550 ease-[cubic-bezier(0.32,0.72,0,1)] animate-modal-open cursor-default">
+        <div className="max-h-[85vh] w-full max-w-full overflow-y-auto overflow-x-hidden rounded-[calc(2.5rem-0.5rem)] bg-white p-5 sm:p-8 border border-white/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)]">
           
           {/* Header Controls */}
-          <div className="no-print mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="no-print sticky top-0 z-20 bg-white mb-6 flex items-center justify-between border-b border-slate-100 pb-4 pt-1">
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800 flex items-center gap-2">
               <ClipboardCheck className="text-brand-green" />
               <span>تقرير فحص عادي</span>
