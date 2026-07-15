@@ -160,3 +160,39 @@ model SystemSettings {
 
   @@map("system_settings")
 }
+
+enum DebtType {
+  LEH
+  ALAYH
+}
+
+enum DebtCurrency {
+  YER
+  SAR
+  USD
+}
+
+model Debtor {
+  id           String            @id @default(uuid())
+  name         String
+  phone        String?
+  address      String?
+  created_at   DateTime          @default(now())
+  transactions DebtTransaction[]
+
+  @@map("debtors")
+}
+
+model DebtTransaction {
+  id         String       @id @default(uuid())
+  debtor_id  String
+  type       DebtType
+  amount     Float        @default(0)
+  currency   DebtCurrency
+  details    String?      @db.Text
+  created_at DateTime     @default(now())
+  debtor     Debtor       @relation(fields: [debtor_id], references: [id], onDelete: Cascade)
+
+  @@index([debtor_id])
+  @@map("debt_transactions")
+}

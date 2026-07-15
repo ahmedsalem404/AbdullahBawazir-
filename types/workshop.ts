@@ -184,7 +184,40 @@ export type CompanyInvoice = {
   created_at: Date | string;
 };
 
-/**
- * @typedef CompanyInvoiceFormValues
- */
 export type CompanyInvoiceFormValues = Omit<CompanyInvoice, "id" | "grand_total" | "branch" | "created_at">;
+
+/**
+ * @typedef Debtor
+ * @description يمثل بيانات المدين في نظام المديونيات.
+ */
+export type Debtor = {
+  id: string;
+  name: string;
+  phone: string | null;
+  address: string | null;
+  created_at: Date | string;
+};
+
+/**
+ * @typedef DebtTxType
+ */
+export type DebtTxType = "LEH" | "ALAYH";
+
+/**
+ * @typedef DebtCurrency
+ */
+export type DebtCurrency = "YER" | "SAR" | "USD";
+
+/**
+ * @typedef DebtTransaction
+ * @description يمثل حركة دائن/مدين في كشف حساب المديون.
+ */
+export type DebtTransaction = {
+  id: string;
+  debtor_id: string;
+  type: DebtTxType;
+  amount: number;
+  currency: DebtCurrency;
+  details: string | null;
+  created_at: Date | string;
+};

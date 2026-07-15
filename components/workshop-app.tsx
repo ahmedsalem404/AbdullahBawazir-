@@ -59,6 +59,11 @@ const CompaniesPanel = dynamic(
   { loading: () => <PanelSkeleton /> }
 );
 
+const DebtorsPanel = dynamic(
+  () => import("./workshop/debtors-panel").then((mod) => mod.DebtorsPanel),
+  { loading: () => <PanelSkeleton /> }
+);
+
 // تحميل ديناميكي للنوافذ المنبثقة لتوفير حجم الحزمة الأولي
 const CustomerModal = dynamic(
   () => import("./workshop/modals").then((mod) => mod.CustomerModal)
@@ -227,6 +232,8 @@ export function WorkshopApp() {
               setB2bInvoiceToPreview({ invoice, company, car });
             }}
           />
+        ) : activeView === "debts" && isSuperAdmin ? (
+          <DebtorsPanel />
         ) : (
           <>
             <DashboardToolbar

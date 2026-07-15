@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Users, LogOut, FileText, Calendar, ClipboardCheck, Shield, Database, TrendingUp, Building, Menu, X, ChevronDown, Wrench } from "lucide-react";
+import { Users, LogOut, FileText, Calendar, ClipboardCheck, Shield, Database, TrendingUp, Building, Menu, X, ChevronDown, Wrench, Scale } from "lucide-react";
 import type { Profile } from "@/lib/types";
 import { WORKSHOP_NAME } from "./constants";
 
@@ -10,8 +10,8 @@ import { InspectionReportsMenu } from "./InspectionReportsMenu";
 
 interface AppHeaderProps {
   profile: Profile;
-  activeView: "dashboard" | "engineers" | "users" | "system" | "analytics" | "companies";
-  onViewChange: (view: "dashboard" | "engineers" | "users" | "system" | "analytics" | "companies") => void;
+  activeView: "dashboard" | "engineers" | "users" | "system" | "analytics" | "companies" | "debts";
+  onViewChange: (view: "dashboard" | "engineers" | "users" | "system" | "analytics" | "companies" | "debts") => void;
   onLogout: () => void;
   onAttendance: () => void;
   onOpenBuySellReport: () => void;
@@ -149,6 +149,21 @@ export function AppHeader({
                     <TrendingUp size={18} />
                     التحليلات
                   </button>
+                  <button
+                    onClick={() =>
+                      onViewChange(
+                        activeView === "debts" ? "dashboard" : "debts",
+                      )
+                    }
+                    className={`hidden lg:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
+                      activeView === "debts"
+                        ? "bg-rose-600 text-white shadow-card"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    <Scale size={18} />
+                    المديونيات
+                  </button>
                 </>
               ) : null}
             </>
@@ -245,6 +260,17 @@ export function AppHeader({
               >
                 <TrendingUp size={16} />
                 <span>التحليلات المالية</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  onViewChange("debts");
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-right text-sm font-bold transition-colors ${activeView === "debts" ? "bg-blue-50 text-blue-600" : "text-slate-600 hover:bg-slate-50"}`}
+              >
+                <Scale size={16} />
+                <span>المديونيات</span>
               </button>
             </>
           )}

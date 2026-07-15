@@ -23,7 +23,7 @@ export function useWorkshop({ profile, onLogout }: UseWorkshopProps) {
     Transfer: { YER: 0, SAR: 0, USD: 0 },
     Manager_Hand: { YER: 0, SAR: 0, USD: 0 }
   });
-  const [activeView, setActiveView] = useState<"dashboard" | "engineers" | "users" | "system" | "analytics" | "companies">("dashboard");
+  const [activeView, setActiveView] = useState<"dashboard" | "engineers" | "users" | "system" | "analytics" | "companies" | "debts">("dashboard");
   const [dateFilter, setDateFilter] = useState(todayInputValue);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
