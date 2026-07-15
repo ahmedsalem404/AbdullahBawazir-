@@ -289,8 +289,13 @@ export function UsersPanel({ currentUserId }: UsersPanelProps) {
                     className="h-11 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none bg-white transition focus:border-brand-green disabled:bg-slate-50 disabled:text-slate-400"
                   >
                     <option value="WORKER">موظف عادي (WORKER)</option>
-                    <option value="ADMIN">مدير فرع (ADMIN)</option>
-                    <option value="SUPER_ADMIN">مدير عام النظام (SUPER_ADMIN)</option>
+                    {/* إخفاء صلاحيات ADMIN و SUPER_ADMIN مؤقتاً عند الإضافة ويظهر فقط في حالة تعديل حساب يمتلكهما */}
+                    {editingUser && editingUser.role === "ADMIN" && (
+                      <option value="ADMIN">مدير فرع (ADMIN)</option>
+                    )}
+                    {editingUser && editingUser.role === "SUPER_ADMIN" && (
+                      <option value="SUPER_ADMIN">مدير عام النظام (SUPER_ADMIN)</option>
+                    )}
                   </select>
                   {editingUser?.id === currentUserId && (
                     <p className="text-[10px] text-amber-600 font-semibold mt-1">تنبيه: لا يمكنك تغيير صلاحيتك الإدارية الخاصة بنفسك.</p>

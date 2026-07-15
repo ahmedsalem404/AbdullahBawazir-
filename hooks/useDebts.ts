@@ -6,7 +6,9 @@ import {
   deleteDebtorService,
   getDebtTransactionsService,
   saveDebtTransactionService,
+  deleteDebtTransactionService,
 } from "@/services/debts";
+import { playSuccessSound, playErrorSound } from "@/components/workshop/constants";
 
 export function useDebts() {
   const [debtors, setDebtors] = useState<Debtor[]>([]);
@@ -24,6 +26,7 @@ export function useDebts() {
   const [editingDebtor, setEditingDebtor] = useState<Debtor | null>(null);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [txModalType, setTxModalType] = useState<DebtTxType>("LEH");
+  const [editingTransaction, setEditingTransaction] = useState<DebtTransaction | null>(null);
 
   const showToast = useCallback((message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -80,6 +83,7 @@ export function useDebts() {
     try {
       const saved = await saveDebtorService(values, editingDebtor?.id);
       showToast(editingDebtor ? "تم تعديل المديون بنجاح" : "تم إضافة المديون بنجاح", "success");
+      playSuccessSound();
       setIsDebtorModalOpen(false);
       setEditingDebtor(null);
       await loadDebtors();
@@ -88,6 +92,7 @@ export function useDebts() {
       }
     } catch (err: any) {
       showToast(err.message || "فشل حفظ المديون", "error");
+      playErrorSound();
     } finally {
       setIsSaving(false);
     }
@@ -99,36 +104,61 @@ export function useDebts() {
     try {
       await deleteDebtorService(id);
       showToast("تم حذف المديون بنجاح", "success");
+      playSuccessSound();
       if (selectedDebtor?.id === id) {
         setSelectedDebtor(null);
       }
       await loadDebtors();
     } catch (err: any) {
       showToast(err.message || "فشل حذف المديون", "error");
+      playErrorSound();
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Add Transaction
+  // Add/Edit Transaction
   const handleAddTransaction = async (amount: number, details: string | null) => {
     if (!selectedDebtor) return;
     setIsSaving(true);
     try {
-      await saveDebtTransactionService({
-        debtor_id: selectedDebtor.id,
-        type: txModalType,
-        amount,
-        currency: selectedCurrency,
-        details,
-      });
-      showToast("تم تسجيل الحركة المالية بنجاح", "success");
+      await saveDebtTransactionService(
+        {
+          debtor_id: selectedDebtor.id,
+          type: txModalType,
+          amount,
+          currency: selectedCurrency,
+          details,
+        },
+        editingTransaction?.id
+      );
+      showToast(editingTransaction ? "تم تعديل الحركة بنجاح" : "تم تسجيل الحركة المالية بنجاح", "success");
+      playSuccessSound();
       setIsTxModalOpen(false);
+      setEditingTransaction(null);
       await loadTransactions(selectedDebtor.id);
     } catch (err: any) {
       showToast(err.message || "فشل تسجيل الحركة المالية", "error");
+      playErrorSound();
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Delete Transaction
+  const handleDeleteTransaction = async (id: string) => {
+    if (!selectedDebtor) return;
+    setIsLoading(true);
+    try {
+      await deleteDebtTransactionService(id);
+      showToast("تم حذف الحركة المالية بنجاح", "success");
+      playSuccessSound();
+      await loadTransactions(selectedDebtor.id);
+    } catch (err: any) {
+      showToast(err.message || "فشل حذف الحركة المالية", "error");
+      playErrorSound();
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -181,9 +211,12 @@ export function useDebts() {
     setIsTxModalOpen,
     txModalType,
     setTxModalType,
+    editingTransaction,
+    setEditingTransaction,
     handleSaveDebtor,
     handleDeleteDebtor,
     handleAddTransaction,
+    handleDeleteTransaction,
     netBalance,
     balanceStatus,
   };

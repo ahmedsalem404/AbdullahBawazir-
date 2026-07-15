@@ -68,17 +68,23 @@ export async function getDebtTransactionsService(
 }
 
 /**
- * تسجيل حركة مديونية جديدة (له أو عليه)
+ * تسجيل حركة مديونية جديدة أو تعديلها (له أو عليه)
  */
-export async function saveDebtTransactionService(values: {
-  debtor_id: string;
-  type: DebtTxType;
-  amount: number;
-  currency: DebtCurrency;
-  details?: string | null;
-}): Promise<DebtTransaction> {
-  const res = await fetch("/api/debts/transactions", {
-    method: "POST",
+export async function saveDebtTransactionService(
+  values: {
+    debtor_id: string;
+    type: DebtTxType;
+    amount: number;
+    currency: DebtCurrency;
+    details?: string | null;
+  },
+  id?: string
+): Promise<DebtTransaction> {
+  const method = id ? "PUT" : "POST";
+  const url = id ? `/api/debts/transactions/${id}` : "/api/debts/transactions";
+
+  const res = await fetch(url, {
+    method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(values),
   });
@@ -87,4 +93,17 @@ export async function saveDebtTransactionService(values: {
     throw new Error(data.error || "فشل تسجيل الحركة المالية");
   }
   return data;
+}
+
+/**
+ * حذف حركة مديونية
+ */
+export async function deleteDebtTransactionService(id: string): Promise<void> {
+  const res = await fetch(`/api/debts/transactions/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "فشل حذف الحركة المالية");
+  }
 }

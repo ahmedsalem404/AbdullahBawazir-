@@ -7,20 +7,18 @@ import {
   Users,
   UserPlus,
   Scale,
-  Plus,
   ArrowRight,
   TrendingUp,
   TrendingDown,
   Trash2,
   Edit,
-  DollarSign,
   Search,
   MapPin,
   Phone,
-  FileText,
   X,
   Sparkles,
-  Calendar
+  Calendar,
+  Settings
 } from "lucide-react";
 import { formatDate } from "./constants";
 
@@ -44,9 +42,12 @@ export function DebtorsPanel() {
     setIsTxModalOpen,
     txModalType,
     setTxModalType,
+    editingTransaction,
+    setEditingTransaction,
     handleSaveDebtor,
     handleDeleteDebtor,
     handleAddTransaction,
+    handleDeleteTransaction,
     netBalance,
     balanceStatus,
   } = useDebts();
@@ -102,8 +103,19 @@ export function DebtorsPanel() {
   };
 
   const openTxModal = (type: DebtTxType) => {
+    setEditingTransaction(null);
     setTxModalType(type);
     setTxForm({ amount: "", details: "" });
+    setIsTxModalOpen(true);
+  };
+
+  const openEditTxModal = (tx: DebtTransaction) => {
+    setEditingTransaction(tx);
+    setTxModalType(tx.type);
+    setTxForm({
+      amount: tx.amount.toString(),
+      details: tx.details || "",
+    });
     setIsTxModalOpen(true);
   };
 
@@ -121,26 +133,36 @@ export function DebtorsPanel() {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes scaleIn {
-          from { transform: scale(0.95); opacity: 0; }
+        @keyframes modalOpen {
+          from { transform: scale(0.96); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
         }
-        .animate-scale-in {
-          animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        .animate-modal-open {
+          animation: modalOpen 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         .animate-fadeInUp {
           animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        @media (max-width: 1024px) {
+          .responsive-td {
+            font-size: 1.05rem !important; /* تكبير خطوط الجدول للجوال والتابلت */
+          }
+        }
       `}</style>
 
-      {/* Toast Notifications */}
+      {/* Centered Toast Notifications */}
       {toast && (
-        <div
-          className={`fixed bottom-5 right-5 z-[100] flex items-center gap-3 rounded-2xl px-5 py-4 text-white shadow-2xl transition-all duration-300 ${
-            toast.type === "success" ? "bg-emerald-600" : "bg-rose-600"
-          }`}
-        >
-          <span className="font-extrabold text-sm">{toast.message}</span>
+        <div className="fixed bottom-8 left-1/2 z-[60] -translate-x-1/2 w-max max-w-[90vw] transition-all duration-300 animate-fadeInUp">
+          <div
+            className={`flex items-center justify-center gap-3 rounded-2xl border px-6 py-4 backdrop-blur-md text-sm sm:text-base font-extrabold text-center ${
+              toast.type === "success"
+                ? "border-emerald-200 bg-white/90 text-emerald-800 shadow-[0_10px_35px_-5px_rgba(16,185,129,0.2)]"
+                : "border-red-200 bg-white/90 text-red-800 shadow-[0_10px_35px_-5px_rgba(239,68,68,0.2)]"
+            }`}
+          >
+            {toast.type === "success" ? <Sparkles size={18} className="text-emerald-600" /> : <X size={18} className="text-rose-600" />}
+            <span>{toast.message}</span>
+          </div>
         </div>
       )}
 
@@ -199,18 +221,18 @@ export function DebtorsPanel() {
               placeholder="ابحث باسم المديون، رقم الهاتف أو العنوان..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200/80 bg-white py-3 pl-4 pr-11 text-sm font-bold text-slate-800 placeholder-slate-400 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/10 transition-all text-right"
+              className="w-full rounded-2xl border border-slate-250 bg-white py-3 pr-11 pl-4 text-sm font-bold text-slate-800 placeholder-slate-400 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/10 transition-all text-right"
             />
           </div>
 
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {[1, 2, 3].map((n) => (
-                <div key={n} className="h-36 rounded-3xl bg-slate-50 border border-slate-100 animate-pulse" />
+                <div key={n} className="h-36 rounded-3xl bg-slate-50 border border-slate-150 animate-pulse" />
               ))}
             </div>
           ) : filteredDebtors.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white p-12 text-center">
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center">
               <Users className="text-slate-300 mb-4" size={48} />
               <h3 className="text-lg font-bold text-slate-700">لا يوجد مديونين مسجلين</h3>
               <p className="text-slate-400 text-xs mt-1">يمكنك البدء بإضافة أول اسم باستخدام الزر بالأعلى.</p>
@@ -221,7 +243,7 @@ export function DebtorsPanel() {
                 <div
                   key={debtor.id}
                   onClick={() => setSelectedDebtor(debtor)}
-                  className="group relative flex flex-col justify-between rounded-3xl border border-slate-200/60 bg-white p-5 shadow-sm transition-all duration-300 hover:border-rose-200 hover:shadow-md hover:shadow-rose-500/5 active:scale-98 cursor-pointer overflow-hidden"
+                  className="group relative flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:border-rose-300 hover:shadow-md hover:shadow-rose-500/5 active:scale-98 cursor-pointer overflow-hidden"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
@@ -239,7 +261,7 @@ export function DebtorsPanel() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (confirm(`هل أنت متأكد من حذف حساب ${debtor.name} وجميع عملياته بشكل نهائي؟`)) {
+                            if (confirm(`هل أنت متأكد من حذف حساب المديون ${debtor.name} وجميع عملياته بشكل نهائي؟ لا يمكن التراجع عن هذا الاجراء.`)) {
                               handleDeleteDebtor(debtor.id);
                             }
                           }}
@@ -284,9 +306,9 @@ export function DebtorsPanel() {
         </div>
       ) : (
         /* VIEW 2: Ledger Detail View */
-        <div className="space-y-6">
+        <div className="space-y-6 animate-fadeInUp">
           {/* Top Bar Actions / Filters */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-slate-50 p-4 rounded-3xl border border-slate-200 shadow-sm">
             {/* Currency Tabs */}
             <div className="flex items-center gap-1.5 p-1 bg-slate-200/60 rounded-2xl w-fit">
               {(["YER", "SAR", "USD"] as DebtCurrency[]).map((cur) => (
@@ -323,28 +345,29 @@ export function DebtorsPanel() {
             </div>
           </div>
 
-          {/* Ledger Table */}
-          <div className="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm">
+          {/* Ledger Table (Bigger & Clearer borders) */}
+          <div className="bg-white rounded-3xl border-2 border-slate-200 overflow-hidden shadow-md">
             <div className="overflow-x-auto max-w-full">
-              <table className="w-full border-collapse text-right text-sm">
+              <table className="w-full border-collapse text-right text-base">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold">
-                    <th className="px-6 py-4">له (دائن)</th>
-                    <th className="px-6 py-4">عليه (مدين)</th>
-                    <th className="px-6 py-4">التفاصيل / البيان</th>
-                    <th className="px-6 py-4">التاريخ والوقت</th>
+                  <tr className="bg-slate-50/80 border-b-2 border-slate-200 text-slate-600 font-extrabold">
+                    <th className="px-6 py-4.5 sm:py-5 border-l border-slate-100">له (دائن)</th>
+                    <th className="px-6 py-4.5 sm:py-5 border-l border-slate-100">عليه (مدين)</th>
+                    <th className="px-6 py-4.5 sm:py-5 border-l border-slate-100">التفاصيل / البيان</th>
+                    <th className="px-6 py-4.5 sm:py-5 border-l border-slate-100">التاريخ والوقت</th>
+                    <th className="px-6 py-4.5 sm:py-5 text-left">التحكم</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-bold text-slate-700">
+                <tbody className="divide-y-2 divide-slate-100 font-bold text-slate-800">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
+                      <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
                         جاري تحميل العمليات...
                       </td>
                     </tr>
                   ) : transactions.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
+                      <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
                         لا توجد عمليات مسجلة بالعملة المحددة حالياً.
                       </td>
                     </tr>
@@ -352,9 +375,9 @@ export function DebtorsPanel() {
                     transactions.map((tx) => (
                       <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors">
                         {/* له */}
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4.5 sm:py-5 responsive-td border-l border-slate-100">
                           {tx.type === "LEH" ? (
-                            <span className="text-emerald-600 font-black">
+                            <span className="text-emerald-600 font-black text-base sm:text-lg">
                               {tx.amount.toLocaleString()} {tx.currency === "YER" ? "ر.ي" : tx.currency === "SAR" ? "ر.س" : "$"}
                             </span>
                           ) : (
@@ -362,9 +385,9 @@ export function DebtorsPanel() {
                           )}
                         </td>
                         {/* عليه */}
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4.5 sm:py-5 responsive-td border-l border-slate-100">
                           {tx.type === "ALAYH" ? (
-                            <span className="text-rose-600 font-black">
+                            <span className="text-rose-600 font-black text-base sm:text-lg">
                               {tx.amount.toLocaleString()} {tx.currency === "YER" ? "ر.ي" : tx.currency === "SAR" ? "ر.س" : "$"}
                             </span>
                           ) : (
@@ -372,13 +395,38 @@ export function DebtorsPanel() {
                           )}
                         </td>
                         {/* التفاصيل */}
-                        <td className="px-6 py-4 text-slate-600 max-w-xs truncate" title={tx.details || ""}>
+                        <td className="px-6 py-4.5 sm:py-5 responsive-td border-l border-slate-100 text-slate-700 max-w-xs truncate" title={tx.details || ""}>
                           {tx.details || <span className="text-slate-300">بدون تفاصيل</span>}
                         </td>
                         {/* التاريخ */}
-                        <td className="px-6 py-4 text-slate-400 font-semibold text-xs flex items-center gap-1.5">
-                          <Calendar size={13} className="text-slate-300" />
-                          <span>{formatDate(tx.created_at)}</span>
+                        <td className="px-6 py-4.5 sm:py-5 responsive-td border-l border-slate-100 text-slate-500 font-semibold text-xs sm:text-sm">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar size={14} className="text-slate-400 shrink-0" />
+                            <span>{formatDate(tx.created_at)}</span>
+                          </div>
+                        </td>
+                        {/* التحكم */}
+                        <td className="px-6 py-4.5 sm:py-5 text-left whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => openEditTxModal(tx)}
+                              className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer"
+                              title="تعديل العملية"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm(`هل أنت متأكد من حذف هذه الحركة المالية بقيمة (${tx.amount.toLocaleString()})؟ لا يمكن التراجع عن هذا الإجراء.`)) {
+                                  handleDeleteTransaction(tx.id);
+                                }
+                              }}
+                              className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer"
+                              title="حذف العملية"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -388,11 +436,11 @@ export function DebtorsPanel() {
             </div>
           </div>
 
-          {/* Net Balance Calculator Box (المربع السفلي المحسوب) */}
-          <div className="flex items-center justify-between gap-4 p-5 rounded-3xl border shadow-sm transition-all duration-300 bg-white border-slate-200">
+          {/* Net Balance Calculator Box */}
+          <div className="flex items-center justify-between gap-4 p-6 rounded-3xl border-2 border-slate-200 shadow-md transition-all duration-300 bg-white">
             <div className="flex items-center gap-3">
               <div
-                className={`h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner ${
+                className={`h-14 w-14 rounded-2xl flex items-center justify-center shadow-inner ${
                   netBalance > 0
                     ? "bg-emerald-50 text-emerald-600"
                     : netBalance < 0
@@ -400,12 +448,12 @@ export function DebtorsPanel() {
                     : "bg-slate-100 text-slate-500"
                 }`}
               >
-                <Sparkles size={22} />
+                <Sparkles size={24} />
               </div>
               <div>
-                <p className="text-slate-400 text-xs font-extrabold">الحسبة الصافية الدقيقة للمديونية</p>
+                <p className="text-slate-400 text-xs sm:text-sm font-extrabold">الحسبة الصافية الدقيقة للمديونية</p>
                 <h4
-                  className={`text-lg sm:text-xl font-black mt-0.5 ${
+                  className={`text-xl sm:text-2xl font-black mt-0.5 ${
                     netBalance > 0 ? "text-emerald-600" : netBalance < 0 ? "text-rose-600" : "text-slate-600"
                   }`}
                 >
@@ -413,14 +461,14 @@ export function DebtorsPanel() {
                 </h4>
               </div>
             </div>
-            <div className="text-slate-400 text-xs font-semibold hidden sm:block">
+            <div className="text-slate-400 text-xs font-semibold hidden lg:block">
               * الصافي = إجمالي المبالغ المستحقة (له) ناقص إجمالي المديونيات (عليه) بالعملة المختارة.
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL 1: Add/Edit Debtor Modal */}
+      {/* MODAL 1: Add/Edit Debtor Modal (Premium Double Wrapper) */}
       {isDebtorModalOpen && (
         <div
           onClick={(e) => {
@@ -428,68 +476,70 @@ export function DebtorsPanel() {
           }}
           className="fixed inset-0 z-50 grid place-items-center bg-slate-950/30 px-4 py-6 backdrop-blur-md cursor-pointer"
         >
-          <div className="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 text-right animate-scale-in cursor-default space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-lg font-black text-slate-800">
-                {editingDebtor ? "تعديل بيانات مديون" : "تسجيل مديون جديد"}
-              </h3>
-              <button
-                onClick={() => setIsDebtorModalOpen(false)}
-                className="h-8 w-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer"
-              >
-                <X size={16} />
-              </button>
+          <div className="w-full max-w-md rounded-[2.5rem] border border-slate-200/40 bg-slate-100/50 p-2 shadow-[0_24px_60px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-all duration-550 ease-[cubic-bezier(0.32,0.72,0,1)] animate-modal-open cursor-default">
+            <div className="max-h-[85vh] w-full overflow-y-auto rounded-[calc(2.5rem-0.5rem)] bg-white p-6 sm:p-8 border border-white/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)] text-right space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-800">
+                  {editingDebtor ? "تعديل بيانات مديون 👤" : "تسجيل مديون جديد 👤"}
+                </h3>
+                <button
+                  onClick={() => setIsDebtorModalOpen(false)}
+                  className="h-9 w-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer transition-all active:scale-90"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={submitDebtorForm} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 block">الاسم الكامل *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="مثال: يوسف أحمد الصالح"
+                    value={debtorForm.name}
+                    onChange={(e) => setDebtorForm({ ...debtorForm, name: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all text-right"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 block">رقم الهاتف (اختياري)</label>
+                  <input
+                    type="text"
+                    placeholder="مثال: 777123456"
+                    value={debtorForm.phone}
+                    onChange={(e) => setDebtorForm({ ...debtorForm, phone: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all text-right"
+                    dir="ltr"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 block">عنوان السكن / المنطقة (اختياري)</label>
+                  <input
+                    type="text"
+                    placeholder="مثال: المنصورة، خلف البريد"
+                    value={debtorForm.address}
+                    onChange={(e) => setDebtorForm({ ...debtorForm, address: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all text-right"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl py-3.5 font-extrabold text-sm shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                >
+                  {isSaving ? "جاري الحفظ..." : "حفظ البيانات"}
+                </button>
+              </form>
             </div>
-
-            <form onSubmit={submitDebtorForm} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 block">الاسم الكامل *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="مثال: يوسف أحمد الصالح"
-                  value={debtorForm.name}
-                  onChange={(e) => setDebtorForm({ ...debtorForm, name: e.target.value })}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/10 transition-all text-right"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 block">رقم الهاتف (اختياري)</label>
-                <input
-                  type="text"
-                  placeholder="مثال: 777123456"
-                  value={debtorForm.phone}
-                  onChange={(e) => setDebtorForm({ ...debtorForm, phone: e.target.value })}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/10 transition-all text-right"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 block">عنوان السكن / المنطقة (اختياري)</label>
-                <input
-                  type="text"
-                  placeholder="مثال: المنصورة، خلف البريد"
-                  value={debtorForm.address}
-                  onChange={(e) => setDebtorForm({ ...debtorForm, address: e.target.value })}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/10 transition-all text-right"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl py-3 font-extrabold text-sm shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-              >
-                {isSaving ? "جاري الحفظ..." : "حفظ البيانات"}
-              </button>
-            </form>
           </div>
         </div>
       )}
 
-      {/* MODAL 2: Add Transaction Modal */}
+      {/* MODAL 2: Add/Edit Transaction Modal (Premium Double Wrapper) */}
       {isTxModalOpen && (
         <div
           onClick={(e) => {
@@ -497,67 +547,73 @@ export function DebtorsPanel() {
           }}
           className="fixed inset-0 z-50 grid place-items-center bg-slate-950/30 px-4 py-6 backdrop-blur-md cursor-pointer"
         >
-          <div className="w-full max-w-md bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 text-right animate-scale-in cursor-default space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                {txModalType === "LEH" ? (
-                  <TrendingUp className="text-emerald-600" size={20} />
-                ) : (
-                  <TrendingDown className="text-rose-600" size={20} />
-                )}
-                <span>تسجيل حركة: {txModalType === "LEH" ? "مستحق (له)" : "مديونية (عليه)"}</span>
-              </h3>
-              <button
-                onClick={() => setIsTxModalOpen(false)}
-                className="h-8 w-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer"
-              >
-                <X size={16} />
-              </button>
-            </div>
+          <div className="w-full max-w-md rounded-[2.5rem] border border-slate-200/40 bg-slate-100/50 p-2 shadow-[0_24px_60px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-all duration-550 ease-[cubic-bezier(0.32,0.72,0,1)] animate-modal-open cursor-default">
+            <div className="max-h-[85vh] w-full overflow-y-auto rounded-[calc(2.5rem-0.5rem)] bg-white p-6 sm:p-8 border border-white/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)] text-right space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                  {txModalType === "LEH" ? (
+                    <TrendingUp className="text-emerald-600" size={22} />
+                  ) : (
+                    <TrendingDown className="text-rose-600" size={22} />
+                  )}
+                  <span>
+                    {editingTransaction
+                      ? `تعديل حركة: ${txModalType === "LEH" ? "مستحق (له)" : "مديونية (عليه)"}`
+                      : `تسجيل حركة: ${txModalType === "LEH" ? "مستحق (له)" : "مديونية (عليه)"}`}
+                  </span>
+                </h3>
+                <button
+                  onClick={() => setIsTxModalOpen(false)}
+                  className="h-9 w-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer transition-all active:scale-90"
+                >
+                  <X size={18} />
+                </button>
+              </div>
 
-            <form onSubmit={submitTxForm} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 block">العملة الحالية</label>
-                <div className="bg-slate-50 border border-slate-150 px-4 py-3 rounded-xl font-black text-slate-700 text-sm">
-                  {selectedCurrency === "YER" ? "ريال يمني" : selectedCurrency === "SAR" ? "ريال سعودي" : "دولار أمريكي"}
+              <form onSubmit={submitTxForm} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 block">العملة الحالية</label>
+                  <div className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl font-black text-slate-700 text-sm">
+                    {selectedCurrency === "YER" ? "ريال يمني" : selectedCurrency === "SAR" ? "ريال سعودي" : "دولار أمريكي"}
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 block">المبلغ المطلوب *</label>
-                <input
-                  type="number"
-                  required
-                  step="any"
-                  min="0.01"
-                  placeholder="أدخل قيمة المبلغ..."
-                  value={txForm.amount}
-                  onChange={(e) => setTxForm({ ...txForm, amount: e.target.value })}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/10 transition-all text-right"
-                />
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 block">المبلغ المطلوب *</label>
+                  <input
+                    type="number"
+                    required
+                    step="any"
+                    min="0.01"
+                    placeholder="أدخل قيمة المبلغ..."
+                    value={txForm.amount}
+                    onChange={(e) => setTxForm({ ...txForm, amount: e.target.value })}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all text-right"
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-500 block">تفاصيل الحركة (البيان)</label>
-                <textarea
-                  placeholder="أدخل سبب أو تفاصيل هذه العملية المالية..."
-                  value={txForm.details}
-                  onChange={(e) => setTxForm({ ...txForm, details: e.target.value })}
-                  rows={3}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/10 transition-all text-right"
-                />
-              </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-500 block">تفاصيل الحركة (البيان)</label>
+                  <textarea
+                    placeholder="أدخل سبب أو تفاصيل هذه العملية المالية..."
+                    value={txForm.details}
+                    onChange={(e) => setTxForm({ ...txForm, details: e.target.value })}
+                    rows={3}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 focus:border-rose-500 focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all text-right"
+                  />
+                </div>
 
-              <button
-                type="submit"
-                disabled={isSaving}
-                className={`w-full text-white rounded-2xl py-3 font-extrabold text-sm shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer ${
-                  txModalType === "LEH" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
-                }`}
-              >
-                {isSaving ? "جاري التسجيل..." : "تسجيل الحركة المالية"}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className={`w-full text-white rounded-2xl py-3.5 font-extrabold text-sm shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer ${
+                    txModalType === "LEH" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
+                  }`}
+                >
+                  {isSaving ? "جاري التسجيل..." : editingTransaction ? "حفظ تعديلات الحركة" : "تسجيل الحركة المالية"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
