@@ -74,12 +74,12 @@ export function AppHeader({
         <div className="flex items-center gap-3">
           <button
             onClick={onAttendance}
-            className="hidden sm:flex h-11 items-center gap-2 rounded-2xl bg-slate-100 px-5 text-sm font-bold text-slate-700 hover:bg-slate-200 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer"
+            className="hidden lg:flex h-11 items-center gap-2 rounded-2xl bg-slate-100 px-5 text-sm font-bold text-slate-700 hover:bg-slate-200 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer"
           >
             <ClipboardCheck size={18} />
             تحضير المهندسين
           </button>
-          <div className="hidden sm:block">
+          <div className="hidden lg:block">
             <InspectionReportsMenu
               onOpenBuySellReport={onOpenBuySellReport}
               onOpenRegularReport={onOpenRegularReport}
@@ -93,7 +93,7 @@ export function AppHeader({
                     activeView === "engineers" ? "dashboard" : "engineers",
                   )
                 }
-                className={`hidden sm:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
+                className={`hidden lg:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
                   activeView === "engineers"
                     ? "bg-blue-600 text-white shadow-card"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -108,7 +108,7 @@ export function AppHeader({
                     activeView === "system" ? "dashboard" : "system",
                   )
                 }
-                className={`hidden sm:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
+                className={`hidden lg:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
                   activeView === "system"
                     ? "bg-brand-green text-white shadow-card"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -125,7 +125,7 @@ export function AppHeader({
                         activeView === "companies" ? "dashboard" : "companies",
                       )
                     }
-                    className={`hidden sm:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
+                    className={`hidden lg:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
                       activeView === "companies"
                         ? "bg-indigo-600 text-white shadow-card"
                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -140,7 +140,7 @@ export function AppHeader({
                         activeView === "analytics" ? "dashboard" : "analytics",
                       )
                     }
-                    className={`hidden sm:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
+                    className={`hidden lg:flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95 cursor-pointer ${
                       activeView === "analytics"
                         ? "bg-indigo-600 text-white shadow-card"
                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -155,7 +155,7 @@ export function AppHeader({
           ) : null}
           <button
             onClick={onLogout}
-            className="hidden sm:grid h-11 w-11 place-items-center rounded-full bg-slate-100 text-slate-700 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red-50 hover:text-red-600 active:scale-95 cursor-pointer"
+            className="hidden lg:grid h-11 w-11 place-items-center rounded-full bg-slate-100 text-slate-700 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red-50 hover:text-red-600 active:scale-95 cursor-pointer"
             aria-label="تسجيل الخروج"
           >
             <LogOut size={20} />
@@ -164,7 +164,7 @@ export function AppHeader({
           {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="flex sm:hidden h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 cursor-pointer"
+            className="flex lg:hidden h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition active:scale-95 cursor-pointer"
             aria-label="قائمة التحكم"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -174,7 +174,7 @@ export function AppHeader({
 
       {/* Expandable Mobile Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="sm:hidden border-t border-slate-150/80 bg-white/95 px-6 py-4 rounded-b-[2rem] space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="lg:hidden border-t border-slate-150/80 bg-white/95 px-6 py-4 rounded-b-[2rem] space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
           <button
             onClick={() => {
               onViewChange("dashboard");

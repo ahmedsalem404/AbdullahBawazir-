@@ -249,12 +249,13 @@ export function RegularReportModal({ onClose, branch = "الحسوة" }: Regular
           </div>
 
           {/* Printable Layout */}
-          <div
-            id="printable-regular-report"
-            ref={reportRef}
-            className="mx-auto w-full bg-white p-12 sm:p-16 print:p-12 text-slate-800 border border-slate-100 rounded-2xl"
-            dir="rtl"
-          >
+          <div className="w-full overflow-x-auto scrollbar-thin">
+            <div
+              id="printable-regular-report"
+              ref={reportRef}
+              className="mx-auto w-[794px] bg-white p-12 text-slate-800 border border-slate-100 rounded-2xl flex-shrink-0"
+              dir="rtl"
+            >
             <header className="mb-6 print:mb-8 flex items-center justify-between border-b-2 border-brand-green pb-6 print:pb-6">
               <div className="flex items-center gap-4">
                 <Image
@@ -331,13 +332,13 @@ export function RegularReportModal({ onClose, branch = "الحسوة" }: Regular
               </ul>
             </div>
 
-            {/* Footer */}
             <footer className="mt-12 print:mt-8 pt-6 print:pt-4 border-t border-slate-200 text-center text-base sm:text-lg print:text-sm font-bold text-slate-500 space-y-2 print:space-y-1">
               <p className="font-extrabold text-slate-700">{branchAddress}</p>
               <p className="text-lg sm:text-xl print:text-base font-extrabold text-slate-850">شكراً لاختياركم مركز عبدالله باوزير لصيانة السيارات.</p>
               <p className="text-xs sm:text-sm print:text-xs text-slate-400 font-bold mt-1">هذا التقرير آلي ولا يحتاج إلى ختم أو توقيع</p>
             </footer>
           </div>
+        </div>
 
           {/* Action Buttons */}
           <div className="no-print mt-8 flex flex-col sm:flex-row gap-4">

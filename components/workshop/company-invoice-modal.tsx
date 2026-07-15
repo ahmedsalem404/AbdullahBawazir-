@@ -184,12 +184,13 @@ export function CompanyInvoiceModal({
           </div>
 
           {/* Printable Area */}
-          <div
-            id="printable-company-invoice"
-            ref={invoiceRef}
-            className="mx-auto w-full bg-white p-12 sm:p-16 print:p-12 text-slate-800"
-            dir="rtl"
-          >
+          <div className="w-full overflow-x-auto scrollbar-thin">
+            <div
+              id="printable-company-invoice"
+              ref={invoiceRef}
+              className="mx-auto w-[794px] bg-white p-12 text-slate-800 flex-shrink-0"
+              dir="rtl"
+            >
             {/* Header Layout */}
             <header className="mb-6 print:mb-8 flex items-center justify-between border-b-2 border-brand-green pb-6 print:pb-6">
               <div className="flex items-center gap-4">
@@ -282,6 +283,7 @@ export function CompanyInvoiceModal({
               <p className="text-xs sm:text-sm print:text-xs text-slate-400 font-bold mt-1">هذه الفاتورة آلية ولا تحتاج إلى ختم أو توقيع</p>
             </footer>
           </div>
+        </div>
 
           {/* Action Buttons */}
           <div className="no-print mt-8 flex flex-col sm:flex-row gap-4">

@@ -154,6 +154,25 @@ export function BuySellReportModal({ onClose, branch = "الحسوة" }: BuySell
         .animate-modal-open {
           animation: modalOpen 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+        @media print {
+          @page {
+            size: A4;
+            margin: 1.5cm;
+          }
+          body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            background-color: white !important;
+          }
+          #printable-buy-sell-report {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+        }
       `}</style>
       <div className="w-full max-w-4xl rounded-[2.5rem] border border-slate-200/40 bg-slate-100/50 p-2 shadow-[0_24px_60px_rgba(0,0,0,0.08)] backdrop-blur-xl transition-all duration-550 ease-[cubic-bezier(0.32,0.72,0,1)] animate-modal-open">
         <div className="max-h-[85vh] w-full overflow-y-auto rounded-[calc(2.5rem-0.5rem)] bg-white p-5 sm:p-8 border border-white/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)]">
@@ -253,12 +272,13 @@ export function BuySellReportModal({ onClose, branch = "الحسوة" }: BuySell
           </div>
 
           {/* Printable Layout */}
-          <div
-            id="printable-buy-sell-report"
-            ref={reportRef}
-            className="mx-auto w-full bg-white p-12 sm:p-16 print:p-12 text-slate-800 border border-slate-100 rounded-2xl"
-            dir="rtl"
-          >
+          <div className="w-full overflow-x-auto scrollbar-thin">
+            <div
+              id="printable-buy-sell-report"
+              ref={reportRef}
+              className="mx-auto w-[794px] bg-white p-12 text-slate-800 border border-slate-100 rounded-2xl flex-shrink-0"
+              dir="rtl"
+            >
             <header className="mb-6 print:mb-8 flex items-center justify-between border-b-2 border-brand-green pb-6 print:pb-6">
               <div className="flex items-center gap-4">
                 <Image
@@ -348,8 +368,9 @@ export function BuySellReportModal({ onClose, branch = "الحسوة" }: BuySell
               <p className="text-xs sm:text-sm print:text-xs text-slate-400 font-bold mt-1">هذا التقرير آلي ولا يحتاج إلى ختم أو توقيع</p>
             </footer>
           </div>
+        </div>
 
-          {/* Action Buttons */}
+        {/* Action Buttons */}
           <div className="no-print mt-8 flex flex-col sm:flex-row gap-4">
             <button
               onClick={printReport}
