@@ -69,32 +69,42 @@ export function NumberField({
   onChange: (value: number) => void;
   required?: boolean;
 }) {
+  const [localValue, setLocalValue] = React.useState(value === 0 ? "" : value.toString());
+
+  React.useEffect(() => {
+    setLocalValue(value === 0 ? "" : value.toString());
+  }, [value]);
+
   return (
     <label className="block text-right">
       <span className="mb-2 block text-sm font-bold text-slate-700">{label}</span>
       <input
-        value={value === 0 ? "" : value}
-        type="number"
-        min={0}
-        step="1"
+        value={localValue}
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
         onChange={(event) => {
-          const val = event.target.value;
+          const val = event.target.value.replace(/[^0-9]/g, ""); // Allow only digits
+          setLocalValue(val);
           if (val === "") {
             onChange(0);
           } else {
-            const num = parseFloat(val);
-            onChange(isNaN(num) ? 0 : Math.round(num));
+            const num = parseInt(val, 10);
+            onChange(isNaN(num) ? 0 : num);
           }
         }}
-        onBlur={(event) => {
-          const val = event.target.value;
-          if (val !== "") {
-            const num = parseFloat(val);
-            onChange(isNaN(num) ? 0 : Math.round(num));
+        onBlur={() => {
+          if (localValue === "") {
+            onChange(0);
+          } else {
+            const num = parseInt(localValue, 10);
+            const cleanNum = isNaN(num) ? 0 : num;
+            onChange(cleanNum);
+            setLocalValue(cleanNum === 0 ? "" : cleanNum.toString());
           }
         }}
         required={required}
-        className="h-12 w-full appearance-none rounded-2xl border border-brand-line bg-white px-4 text-base outline-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus:border-brand-green focus:ring-4 focus:ring-brand-green/12 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+        className="h-12 w-full rounded-2xl border border-brand-line bg-white px-4 text-base outline-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] focus:border-brand-green focus:ring-4 focus:ring-brand-green/12"
       />
     </label>
   );
