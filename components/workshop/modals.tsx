@@ -120,7 +120,7 @@ export function CustomerModal({
 
   const modalStatus = values.is_not_worked_on
     ? "لم يتم العمل"
-    : (remaining <= 0 ? "مدفوع" : "قيد العمل");
+    : (values.required_amount <= 0 ? "قيد العمل" : (remaining <= 0 ? "مدفوع" : "قيد العمل"));
 
   function update<K extends keyof CustomerFormValues>(
     key: K,

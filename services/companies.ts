@@ -68,13 +68,17 @@ export async function getCompanyCarsService(companyId: string): Promise<CompanyC
 }
 
 /**
- * حفظ سيارة شركة جديدة
+ * حفظ سيارة شركة جديدة أو تعديلها
  */
 export async function saveCompanyCarService(
-  values: CompanyCarFormValues
+  values: CompanyCarFormValues,
+  id?: string
 ): Promise<CompanyCar> {
-  const res = await fetch("/api/companies/cars", {
-    method: "POST",
+  const method = id ? "PUT" : "POST";
+  const url = id ? `/api/companies/cars?id=${id}` : "/api/companies/cars";
+
+  const res = await fetch(url, {
+    method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(values),
   });
@@ -84,6 +88,19 @@ export async function saveCompanyCarService(
     throw new Error(data.error || "فشل حفظ سيارة الشركة");
   }
   return data;
+}
+
+/**
+ * حذف سيارة شركة
+ */
+export async function deleteCompanyCarService(id: string): Promise<void> {
+  const res = await fetch(`/api/companies/cars?id=${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "فشل حذف سيارة الشركة");
+  }
 }
 
 /**

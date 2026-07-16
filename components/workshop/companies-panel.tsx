@@ -78,6 +78,8 @@ export function CompaniesPanel({
     isCompanyModalOpen,
     editingCompany,
     isCarModalOpen,
+    editingCar,
+    deleteTargetCar,
     isInvoiceModalOpen,
     editingInvoice,
     deleteTargetInvoice,
@@ -85,6 +87,8 @@ export function CompaniesPanel({
     setIsCompanyModalOpen,
     setEditingCompany,
     setIsCarModalOpen,
+    setEditingCar,
+    setDeleteTargetCar,
     setIsInvoiceModalOpen,
     setEditingInvoice,
     setDeleteTargetInvoice,
@@ -92,6 +96,7 @@ export function CompaniesPanel({
     saveCompany,
     deleteCompany,
     saveCar,
+    deleteCar,
     saveInvoice,
     deleteInvoice,
     viewCompanyCars,
@@ -135,6 +140,19 @@ export function CompaniesPanel({
 
   const openAddCar = () => {
     setCarForm({ name: "", year: "", color: "", plate_or_chassis: "" });
+    setEditingCar(null);
+    setIsCarModalOpen(true);
+  };
+
+  const openEditCar = (car: CompanyCar, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCarForm({
+      name: car.name,
+      year: car.year || "",
+      color: car.color || "",
+      plate_or_chassis: car.plate_or_chassis,
+    });
+    setEditingCar(car);
     setIsCarModalOpen(true);
   };
 
@@ -493,13 +511,29 @@ export function CompaniesPanel({
                               )}
                             </td>
                             <td className="px-6 py-5 text-center" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                onClick={() => viewCarInvoices(car)}
-                                className="inline-flex h-9 items-center gap-2 rounded-xl bg-indigo-50 px-3.5 text-xs text-indigo-700 hover:bg-indigo-100 font-extrabold transition-all duration-200 active:scale-95 cursor-pointer border border-indigo-100/50"
-                              >
-                                <FileText size={13} />
-                                سجل الفواتير
-                              </button>
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => viewCarInvoices(car)}
+                                  className="inline-flex h-9 items-center gap-2 rounded-xl bg-indigo-50 px-3.5 text-xs text-indigo-700 hover:bg-indigo-100 font-extrabold transition-all duration-200 active:scale-95 cursor-pointer border border-indigo-100/50"
+                                >
+                                  <FileText size={13} />
+                                  سجل الفواتير
+                                </button>
+                                <button
+                                  onClick={(e) => openEditCar(car, e)}
+                                  className="grid h-9 w-9 place-items-center rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 active:scale-90 cursor-pointer border border-slate-100"
+                                  title="تعديل السيارة"
+                                >
+                                  <Edit3 size={14} />
+                                </button>
+                                <button
+                                  onClick={() => setDeleteTargetCar(car)}
+                                  className="grid h-9 w-9 place-items-center rounded-xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all duration-200 active:scale-90 cursor-pointer border border-slate-100"
+                                  title="حذف السيارة"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -709,7 +743,7 @@ export function CompaniesPanel({
                     <Car size={20} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-extrabold text-slate-800">تسجيل سيارة جديدة</h3>
+                    <h3 className="text-lg font-extrabold text-slate-800">{editingCar ? "تعديل بيانات السيارة" : "تسجيل سيارة جديدة"}</h3>
                     <p className="text-xs font-semibold text-slate-400">ضمن أسطول {selectedCompany?.name}</p>
                   </div>
                 </div>
@@ -733,7 +767,7 @@ export function CompaniesPanel({
                     <input type="text" value={carForm.color} onChange={(e) => setCarForm({ ...carForm, color: e.target.value })} placeholder="مثل: أبيض" className={INPUT_CLASS} />
                   </FormField>
                 </div>
-                <ModalActions onCancel={() => setIsCarModalOpen(false)} submitLabel="إضافة السيارة" isSaving={isSaving} />
+                <ModalActions onCancel={() => setIsCarModalOpen(false)} submitLabel={editingCar ? "حفظ التعديلات" : "إضافة السيارة"} isSaving={isSaving} />
               </form>
             </div>
           </div>
@@ -836,13 +870,21 @@ export function CompaniesPanel({
         </div>
       )}
 
-      {/* ── Confirm Deletion Modals ── */}
+       {/* ── Confirm Deletion Modals ── */}
       {deleteTargetCompany && (
         <ConfirmModal
           title="حذف الشركة المتعاقدة"
           body={`هل أنت متأكد من حذف شركة (${deleteTargetCompany.name})؟ سيؤدي ذلك لحذف جميع سيارات الشركة وسجلات صيانتها وفواتيرها كلياً ولا يمكن التراجع.`}
           onCancel={() => setDeleteTargetCompany(null)}
           onConfirm={() => deleteCompany(deleteTargetCompany.id)}
+        />
+      )}
+      {deleteTargetCar && (
+        <ConfirmModal
+          title="حذف سيارة من الأسطول"
+          body={`هل أنت متأكد من حذف سيارة (${deleteTargetCar.name} - لوحة: ${deleteTargetCar.plate_or_chassis}) من الشركة؟ سيؤدي ذلك لحذف جميع فواتير الصيانة والتقارير المرتبطة بها نهائياً ولا يمكن التراجع.`}
+          onCancel={() => setDeleteTargetCar(null)}
+          onConfirm={() => deleteCar(deleteTargetCar.id)}
         />
       )}
       {deleteTargetInvoice && (

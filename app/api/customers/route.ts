@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         SELECT id FROM customers 
         WHERE branch = ${session.branch} 
           AND is_not_worked_on = false 
-          AND paid_amount < (required_amount - injectors_amount)
+          AND (required_amount = 0 OR paid_amount < (required_amount - injectors_amount))
       `;
       const ids = matching.map(c => c.id);
       where.id = { in: ids };
@@ -103,6 +103,8 @@ export async function GET(request: NextRequest) {
       let status = "قيد العمل";
       if (c.is_not_worked_on) {
         status = "لم يتم العمل";
+      } else if (c.required_amount <= 0) {
+        status = "قيد العمل";
       } else if (rem <= 0) {
         status = "مدفوع";
       }

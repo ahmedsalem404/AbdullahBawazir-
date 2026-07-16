@@ -13,10 +13,12 @@ import {
   deleteCompanyService,
   getCompanyCarsService,
   saveCompanyCarService,
+  deleteCompanyCarService,
   getCompanyInvoicesService,
   saveCompanyInvoiceService,
   deleteCompanyInvoiceService,
 } from "@/services/companies";
+import { playSuccessSound, playErrorSound } from "@/components/workshop/constants";
 
 export function useCompanies() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -34,6 +36,8 @@ export function useCompanies() {
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [isCarModalOpen, setIsCarModalOpen] = useState(false);
+  const [editingCar, setEditingCar] = useState<CompanyCar | null>(null);
+  const [deleteTargetCar, setDeleteTargetCar] = useState<CompanyCar | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<CompanyInvoice | null>(null);
   const [deleteTargetInvoice, setDeleteTargetInvoice] = useState<CompanyInvoice | null>(null);
@@ -111,11 +115,13 @@ export function useCompanies() {
     try {
       await saveCompanyService(values, editingCompany?.id);
       showToast(editingCompany ? "تم تحديث بيانات الشركة بنجاح" : "تم إضافة الشركة بنجاح", "success");
+      playSuccessSound();
       setIsCompanyModalOpen(false);
       setEditingCompany(null);
       loadCompanies();
     } catch (err: any) {
       showToast(err.message || "فشل حفظ بيانات الشركة", "error");
+      playErrorSound();
     } finally {
       setIsSaving(false);
     }
@@ -126,10 +132,12 @@ export function useCompanies() {
     try {
       await deleteCompanyService(id);
       showToast("تم حذف الشركة بنجاح", "success");
+      playSuccessSound();
       setDeleteTargetCompany(null);
       loadCompanies();
     } catch (err: any) {
       showToast(err.message || "فشل حذف الشركة", "error");
+      playErrorSound();
     }
   };
 
@@ -138,17 +146,38 @@ export function useCompanies() {
     if (!selectedCompany) return;
     setIsSaving(true);
     try {
-      await saveCompanyCarService({
-        ...values,
-        company_id: selectedCompany.id,
-      });
-      showToast("تم إضافة السيارة بنجاح", "success");
+      await saveCompanyCarService(
+        {
+          ...values,
+          company_id: selectedCompany.id,
+        },
+        editingCar?.id
+      );
+      showToast(editingCar ? "تم تحديث بيانات السيارة بنجاح" : "تم إضافة السيارة بنجاح", "success");
+      playSuccessSound();
       setIsCarModalOpen(false);
+      setEditingCar(null);
       loadCars(selectedCompany.id);
     } catch (err: any) {
-      showToast(err.message || "فشل إضافة السيارة", "error");
+      showToast(err.message || "فشل حفظ السيارة", "error");
+      playErrorSound();
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Delete Car
+  const deleteCar = async (id: string) => {
+    if (!selectedCompany) return;
+    try {
+      await deleteCompanyCarService(id);
+      showToast("تم حذف السيارة بنجاح", "success");
+      playSuccessSound();
+      setDeleteTargetCar(null);
+      loadCars(selectedCompany.id);
+    } catch (err: any) {
+      showToast(err.message || "فشل حذف السيارة", "error");
+      playErrorSound();
     }
   };
 
@@ -165,11 +194,13 @@ export function useCompanies() {
         editingInvoice?.id
       );
       showToast(editingInvoice ? "تم تحديث الفاتورة بنجاح" : "تم تسجيل الفاتورة بنجاح", "success");
+      playSuccessSound();
       setIsInvoiceModalOpen(false);
       setEditingInvoice(null);
       loadInvoices(selectedCar.id, selectedMonth, selectedYear, selectedAccounted, selectedSent);
     } catch (err: any) {
       showToast(err.message || "فشل حفظ الفاتورة", "error");
+      playErrorSound();
     } finally {
       setIsSaving(false);
     }
@@ -181,10 +212,12 @@ export function useCompanies() {
     try {
       await deleteCompanyInvoiceService(id);
       showToast("تم حذف الفاتورة بنجاح", "success");
+      playSuccessSound();
       setDeleteTargetInvoice(null);
       loadInvoices(selectedCar.id, selectedMonth, selectedYear, selectedAccounted, selectedSent);
     } catch (err: any) {
       showToast(err.message || "فشل حذف الفاتورة", "error");
+      playErrorSound();
     }
   };
 
@@ -242,6 +275,8 @@ export function useCompanies() {
     isCompanyModalOpen,
     editingCompany,
     isCarModalOpen,
+    editingCar,
+    deleteTargetCar,
     isInvoiceModalOpen,
     editingInvoice,
     deleteTargetInvoice,
@@ -249,6 +284,8 @@ export function useCompanies() {
     setIsCompanyModalOpen,
     setEditingCompany,
     setIsCarModalOpen,
+    setEditingCar,
+    setDeleteTargetCar,
     setIsInvoiceModalOpen,
     setEditingInvoice,
     setDeleteTargetInvoice,
@@ -257,6 +294,7 @@ export function useCompanies() {
     saveCompany,
     deleteCompany,
     saveCar,
+    deleteCar,
     saveInvoice,
     deleteInvoice,
     viewCompanyCars,
