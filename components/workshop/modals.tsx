@@ -226,16 +226,19 @@ export function CustomerModal({
               label="المبلغ المطلوب"
               value={values.required_amount}
               onChange={(value) => update("required_amount", value)}
+              allowDecimals={values.currency !== "YER"}
             />
             <NumberField
               label="مبلغ تنظيف البخاخات"
               value={values.injectors_amount || 0}
               onChange={(value) => update("injectors_amount", value)}
+              allowDecimals={values.currency !== "YER"}
             />
             <NumberField
               label="المبلغ المدفوع"
               value={values.paid_amount}
               onChange={(value) => update("paid_amount", value)}
+              allowDecimals={values.currency !== "YER"}
             />
 
             {/* اختيار العملة */}

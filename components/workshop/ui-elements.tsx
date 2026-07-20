@@ -63,11 +63,13 @@ export function NumberField({
   value,
   onChange,
   required,
+  allowDecimals = false,
 }: {
   label: string;
   value: number;
   onChange: (value: number) => void;
   required?: boolean;
+  allowDecimals?: boolean;
 }) {
   const [localValue, setLocalValue] = React.useState(value === 0 ? "" : value.toString());
 
@@ -81,15 +83,25 @@ export function NumberField({
       <input
         value={localValue}
         type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
+        inputMode={allowDecimals ? "decimal" : "numeric"}
+        pattern={allowDecimals ? "[0-9]*[.,]?[0-9]*" : "[0-9]*"}
         onChange={(event) => {
-          const val = event.target.value.replace(/[^0-9]/g, ""); // Allow only digits
+          let val = event.target.value;
+          if (allowDecimals) {
+            // Allow only digits and a single dot/comma
+            val = val.replace(/[^0-9.,]/g, "").replace(",", ".");
+            const parts = val.split(".");
+            if (parts.length > 2) {
+              val = parts[0] + "." + parts.slice(1).join("");
+            }
+          } else {
+            val = val.replace(/[^0-9]/g, "");
+          }
           setLocalValue(val);
-          if (val === "") {
+          if (val === "" || val === ".") {
             onChange(0);
           } else {
-            const num = parseInt(val, 10);
+            const num = parseFloat(val);
             onChange(isNaN(num) ? 0 : num);
           }
         }}
@@ -97,10 +109,11 @@ export function NumberField({
           if (localValue === "") {
             onChange(0);
           } else {
-            const num = parseInt(localValue, 10);
+            const num = parseFloat(localValue);
             const cleanNum = isNaN(num) ? 0 : num;
-            onChange(cleanNum);
-            setLocalValue(cleanNum === 0 ? "" : cleanNum.toString());
+            const roundedNum = allowDecimals ? Number(cleanNum.toFixed(2)) : Math.round(cleanNum);
+            onChange(roundedNum);
+            setLocalValue(roundedNum === 0 ? "" : roundedNum.toString());
           }
         }}
         required={required}

@@ -181,13 +181,17 @@ export function useDebts() {
     return lehSum - alayhSum;
   }, [filteredTransactions]);
 
-  // Balance status message
   const balanceStatus = useMemo(() => {
     const currencyLabel = selectedCurrency === "YER" ? "يمني" : selectedCurrency === "SAR" ? "سعودي" : "دولار";
+    const isYemeni = selectedCurrency === "YER";
+    const formattedAmount = Math.abs(netBalance).toLocaleString("ar-SA", {
+      maximumFractionDigits: isYemeni ? 0 : 2,
+      minimumFractionDigits: isYemeni ? 0 : 0,
+    });
     if (netBalance > 0) {
-      return `له: ${netBalance.toLocaleString("ar-SA")} ${currencyLabel}`;
+      return `له: ${formattedAmount} ${currencyLabel}`;
     } else if (netBalance < 0) {
-      return `عليه مديونية: ${Math.abs(netBalance).toLocaleString("ar-SA")} ${currencyLabel}`;
+      return `عليه مديونية: ${formattedAmount} ${currencyLabel}`;
     }
     return `الحساب متزن (0) ${currencyLabel}`;
   }, [netBalance, selectedCurrency]);

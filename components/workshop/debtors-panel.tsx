@@ -20,7 +20,7 @@ import {
   Calendar,
   Settings
 } from "lucide-react";
-import { formatDate } from "./constants";
+import { formatDate, formatCurrency } from "./constants";
 
 export function DebtorsPanel() {
   const {
@@ -378,7 +378,7 @@ export function DebtorsPanel() {
                         <td className="px-6 py-4.5 sm:py-5 responsive-td border-l border-slate-100">
                           {tx.type === "LEH" ? (
                             <span className="text-emerald-600 font-black text-base sm:text-lg">
-                              {tx.amount.toLocaleString()} {tx.currency === "YER" ? "ر.ي" : tx.currency === "SAR" ? "ر.س" : "$"}
+                              {formatCurrency(tx.amount, tx.currency)}
                             </span>
                           ) : (
                             <span className="text-slate-300">-</span>
@@ -388,7 +388,7 @@ export function DebtorsPanel() {
                         <td className="px-6 py-4.5 sm:py-5 responsive-td border-l border-slate-100">
                           {tx.type === "ALAYH" ? (
                             <span className="text-rose-600 font-black text-base sm:text-lg">
-                              {tx.amount.toLocaleString()} {tx.currency === "YER" ? "ر.ي" : tx.currency === "SAR" ? "ر.س" : "$"}
+                              {formatCurrency(tx.amount, tx.currency)}
                             </span>
                           ) : (
                             <span className="text-slate-300">-</span>

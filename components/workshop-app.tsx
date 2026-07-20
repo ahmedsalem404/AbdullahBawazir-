@@ -9,7 +9,7 @@ import { AppHeader } from "./workshop/app-header";
 import { DashboardToolbar } from "./workshop/dashboard-toolbar";
 import { CustomersGrid } from "./workshop/customers-grid";
 import dynamic from "next/dynamic";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { Company, CompanyCar, CompanyInvoice, Engineer } from "@/types/workshop";
 
 // هيكل الانتظار لوحة Apple-style Skeleton Loader
@@ -110,6 +110,22 @@ const BackupReminderModal = dynamic(
  */
 export function WorkshopApp() {
   const { profile, authError, login, logout, checkSession } = useAuth();
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (
+        document.activeElement &&
+        document.activeElement.tagName === "INPUT" &&
+        (document.activeElement as HTMLInputElement).type === "number"
+      ) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      document.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   const {
     customers,

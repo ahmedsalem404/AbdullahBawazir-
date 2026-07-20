@@ -16,9 +16,10 @@ export const todayInputValue = () => {
  * تنسيق المبلغ ليعرض بالعملة المحددة (سعودي، يمني، دولار)
  */
 export const formatCurrency = (value: number, currency: string = "SAR") => {
+  const isYemeni = currency === "YER";
   const formatted = new Intl.NumberFormat("ar-SA", {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
+    maximumFractionDigits: isYemeni ? 0 : 2,
+    minimumFractionDigits: isYemeni ? 0 : 0,
   }).format(value);
 
   if (currency === "YER") return `${formatted} ر.ي`;
